@@ -1,6 +1,5 @@
 import ws281x from 'node-rpi-ws281x-native'
 import util from '../fx_util'
-import Scene from './scene'
 
 const DEFAULT_CONFIG = {
     invert: 0,

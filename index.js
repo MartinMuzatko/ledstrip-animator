@@ -1,7 +1,6 @@
 #!/usr/bin/node
 import express from 'express'
 import http from 'http'
-import fs from 'fs'
 import Pixels from './classes/pixels'
 import Pixel from './classes/pixel'
 import Scene from './classes/scene'
@@ -59,7 +58,7 @@ socketIo.on('connection', function(socket) {
     console.log('a user connected from ' + socket.client.conn.remoteAddress + ", clientId=" + clientId)
 
     socket.emit('current', JSON.stringify(ledstrip.get()))
-        
+
     socket.on('setPixels', data => {
         ledstrip.set(JSON.parse(data))
     })

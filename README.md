@@ -5,6 +5,9 @@
 
 Originally based off of https://github.com/Zefiro/wodo-raspi-light
 All attribution goes to [@Zefiro](https://github.com/Zefiro) for preparing the base of this app and for introducing me to the magic of nodejs-controlled IoT.
+
+I talked about this at StuttgartJS - see the slides here: https://slides.com/martinmuzatko-1/iot/
+
 ## Install
 
 ```

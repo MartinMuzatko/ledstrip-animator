@@ -21,7 +21,6 @@ import extend from 'extend'
 import Sequence from '../classes/sequence'
 import Pixel from '../classes/pixel'
 
-// const socket = io('localhost:3000')
 const socket = io('192.168.43.254:3000')
 
 export default {
@@ -38,7 +37,6 @@ export default {
 	watch: {
 		sequences: {
 			handler() {
-				console.log(JSON.stringify(this.sequences))
 				socket.emit('setScene', JSON.stringify(this.sequences))
 			},
 			deep: true
@@ -69,7 +67,7 @@ export default {
 		},
 		renderSequence() {
 			this.activeSequence = this.getCurrentSequence(this.sequences.frames[this.activeFrame % this.sequences.frames.length])
-			
+
 			this.activeFrame++
 			setTimeout(this.renderSequence, 1000 / parseInt(this.fps))
 		},
@@ -77,7 +75,7 @@ export default {
 			this.sequences.remove(index)
 		},
 		clone(index) {
-			this.sequences.add(this.sequences.frames[index])
+			this.sequences.frames.splice(index, 0, JSON.parse(JSON.stringify(this.sequences.frames[index])))
 		}
 	}
 }

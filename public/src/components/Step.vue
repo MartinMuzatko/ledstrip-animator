@@ -15,21 +15,22 @@
 				<div>
 					<template v-if="!display">
 						<div>
-							<q-btn icon="skip_previous" @click="pixels.moveLeft()" color="primary">Move left</q-btn>
-							<q-btn icon="skip_next" @click="pixels.moveRight()" color="primary">Move right</q-btn>
+							<q-btn class="q-ma-sm" icon="skip_previous" @click="pixels.moveLeft()" color="primary">Move left</q-btn>
+							<q-btn class="q-ma-sm" icon="skip_next" @click="pixels.moveRight()" color="primary">Move right</q-btn>
 						</div>
 						<div>
-							<q-btn icon="grain" @click="pixels.randomize()" color="primary">Randomize</q-btn>
-							<q-btn icon="grain" @click="pixels.dither()" color="primary">Dither</q-btn>
-							<q-btn icon="format_color_fill" @click="pixels.fill(color.rgba)" color="primary">Fill Color</q-btn>
+							<q-btn class="q-ma-sm" icon="grain" @click="pixels.randomize()" color="primary">Randomize</q-btn>
+							<q-btn class="q-ma-sm" icon="grain" @click="pixels.dither()" color="primary">Dither</q-btn>
+							<q-btn class="q-ma-sm" icon="format_color_fill" @click="pixels.fill(color.rgba)" color="primary">Fill Color</q-btn>
 						</div>
 					</template>
 					<div class="row pixels">
-						<div 
+						<div
 							v-for="(pixel, index) in pixels.pixels"
-							@click="setActivePixel(index)" 
+							@click="setActivePixel($event, index)"
 							:key="index"
-							:style="getPixelColor(pixel)" 
+							:style="getPixelColor(pixel)"
+							class="pixel"
 							:class="isPixelActiveClass(pixel, index)">
 						</div>
 					</div>
@@ -50,16 +51,16 @@
 
 export default {
 	props: {
-		amount: Number, 
-		pixels: {}, 
-		index: Number, 
+		amount: Number,
+		pixels: {},
+		index: Number,
 		display: Boolean,
 	},
 	data () {
 		return {
 			duration: 1,
 			selectedPixel: false,
-			selectedPixelIndex: -1,
+			selectedPixelIndexes: [],
 			color: {rgba: {r:0,g:0,b:0,a:1}},
 		}
 	},
@@ -73,27 +74,37 @@ export default {
 				g: this.color.rgba.g,
 				b: this.color.rgba.b,
 			}
-			this.pixels.set(this.selectedPixelIndex, this.selectedPixel)
+			this.selectedPixelIndexes.map(index =>
+				this.pixels.set(index, this.selectedPixel)
+			)
 		},
 		duration() {
-			this.pixels.duration = parseFloat(this.duration)
+			this.pixels.duration = parseFloat(this.duration) || 1
 		},
 	},
 	methods: {
 		isPixelActiveClass(pixel, index) {
 			return {
-				pixel: true,
-				'pixel--selected': index == this.selectedPixelIndex 
+				'pixel--selected': this.selectedPixelIndexes.includes(index)
 			}
 		},
 		getPixelColor(pixel) {
 			return { backgroundColor: `rgb(${pixel.r}, ${pixel.g}, ${pixel.b})` }
 		},
-		setActivePixel(index) {
-			let pixel = this.pixels.get(index)
+		setActivePixel(event, index) {
+			const pixel = this.pixels.get(index)
 			this.selectedPixel = pixel
-			this.selectedPixelIndex = index
-			console.log(this.$refs.colorpicker)
+			if (!event.shiftKey) {
+				this.selectedPixelIndexes = [index]
+			} else {
+				const startIndex = this.selectedPixelIndexes[0]
+				const selectionLength = (startIndex > index ? startIndex - index : index - startIndex) + 1
+				const directionUp = startIndex > index
+				this.selectedPixelIndexes = [
+					...this.selectedPixelIndexes[0],
+					...Array.from(Array(selectionLength)).map((element, selectIndex) => index + (directionUp ? selectIndex : -selectIndex))
+				]
+			}
 			this.color = {
 				rgba: {
 					r: pixel.r,

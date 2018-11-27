@@ -1,5 +1,5 @@
 import Pixels from '../classes/pixels'
-import extend from 'extend'
+// import extend from 'extend'
 
 export default class Sequence {
     constructor(amount = 1, size = 50) {
@@ -7,7 +7,7 @@ export default class Sequence {
         this.dim = 100
         this.frames = Array.from(Array(parseInt(amount)))
             .fill()
-            .map(frame => frame = new Pixels(size))
+            .map(() => new Pixels(size))
     }
 
     add(newPixels) {

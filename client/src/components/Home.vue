@@ -1,5 +1,17 @@
 <template>
 	<div>
+		<div>
+			<q-select
+				v-if="scenes"
+				v-model="selectedScene"
+				float-label="Existing Scenes"
+				:options="scenes"
+			/>
+		</div>
+		<div>
+			<q-input type="text" v-model="scene" stack-label="Scene Name" />
+			<q-btn icon="save" color="primary">Save</q-btn>
+		</div>
 		<q-input type="number" :min="1" :max="100" v-model="pixels" stack-label="Amount of Pixels" />
 		<q-input type="number" :min="1" :max="50" v-model="fps" stack-label="Frames per second" />
 		<q-input type="number" :min="1" :max="100" v-model="dim" stack-label="Dim" />
@@ -16,12 +28,16 @@
 </template>
 
 <script>
-import * as io from 'socket.io-client'
+import Axios from 'axios'
 import extend from 'extend'
 import Sequence from '../classes/sequence'
 import Pixel from '../classes/pixel'
 
-const socket = io('192.168.43.254:3000')
+const BASEURL = 'http://192.168.255.52:8090'
+
+const axios = Axios.create({
+	baseURL: BASEURL
+})
 
 export default {
 	data () {
@@ -32,12 +48,15 @@ export default {
 			sequences: {},
 			activeSequence: {},
 			activeFrame: 0,
+			scenes: null,
+			scene: null,
+			selectedScene: null,
 		}
 	},
 	watch: {
 		sequences: {
 			handler() {
-				socket.emit('setScene', JSON.stringify(this.sequences))
+				axios.post('/api/pixels', this.sequences)
 			},
 			deep: true
 		},
@@ -45,7 +64,9 @@ export default {
 			this.sequences.size = this.pixels
 		}
 	},
-	created() {
+	async created() {
+		const { data: { scenes } } = await axios.get('/api/scenes')
+		this.scenes = scenes
 		this.sequences = new Sequence()
 		this.renderSequence()
 	},

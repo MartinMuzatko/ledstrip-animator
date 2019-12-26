@@ -1,5 +1,5 @@
 const t = require('ava').default
-const scene = require('../lib/ledloop')
+const scene = require('../ledloop')
 
 t('turn pixels into UIntArray', t => {
     const pixels = scene.getPixelArray([

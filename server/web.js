@@ -2,20 +2,23 @@ const express = require('express')
 const { tween, eventloop } = require('./ledloop')
 const scenes = require('./scenes')
 const bodyParser = require('body-parser')
+const cors = require('cors')
 
 const CLIENTPATH = '../client/dist'
 
 const init = ({ ledControl, ws281x, setup, port }) => {
     let currentScene = null
-    // const cors = require('cors')
     const app = express()
     app.use(bodyParser.json())
+    app.use(cors())
     app.use('/', express.static(CLIENTPATH))
     app.get('/api/pixels/current', (req, res) => res.send(currentScene))
     app.post('/api/pixels', (req, res) => {
-        const pixels = req.body.reduce((previous, current, index, items) => {
+        const { size, dim, frames } = req.body
+        setup(size)
+        const pixels = frames.reduce((previous, current, index, items) => {
             const next = items[index + 1] || items[0]
-            return [...previous, ...tween(30, current, next)]
+            return [...previous, ...tween(30 * parseFloat(current.duration), current.pixels, next.pixels)]
         }, [])
         currentScene = pixels
         ledControl.emit('stop')

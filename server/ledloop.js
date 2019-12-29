@@ -1,12 +1,13 @@
 "use strict"
-const { curry, map, fromPairs } = require('ramda') 
+const { curry, map, fromPairs, min, max, pipe } = require('ramda')
 
 const getPixelArray = (pixels, rgborder = 'rgb') => {
     const order = rgborder.split('')
     const rgbByOrder = convertRgbToIntByOrder(order)
-    return new Uint32Array(pixels.map(rgbByOrder))
+    return new Uint32Array(pipe(map(colorbitRange), map(rgbByOrder))(pixels))
 }
 
+const colorbitRange = pipe(max(0), min(255))
 const convertRgbToIntByOrder = curry((order, pixel) => rgbToInt(pixel[order[0]], pixel[order[1]], pixel[order[2]]))
 const rgbToInt = (r, g, b) => ((r & 0x0ff) << 16) | ((g & 0x0ff) << 8) | (b & 0x0ff)
 const rgb = (r = 0, g = 0, b = 0) => ({ r, g, b })
@@ -71,4 +72,5 @@ module.exports = {
     fadeRgb,
     eventloop,
     rgb,
+    tick,
 }

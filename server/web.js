@@ -6,13 +6,14 @@ const cors = require('cors')
 
 const CLIENTPATH = '../client/dist'
 
-const init = ({ ledControl, ws281x, setup, port }) => {
+const init = ({ ledControl, setup, port }) => {
     let currentScene = null
     const app = express()
     app.use(bodyParser.json())
     app.use(cors())
     app.use('/', express.static(CLIENTPATH))
     app.get('/api/pixels/current', (req, res) => res.send(currentScene))
+    // fade mode
     app.post('/api/pixels', (req, res) => {
         const { size, dim, frames } = req.body
         setup(size)
@@ -23,6 +24,14 @@ const init = ({ ledControl, ws281x, setup, port }) => {
         currentScene = pixels
         ledControl.emit('stop')
         eventloop(pixels, ledControl, 30, true)
+        res.sendStatus(200)
+    })
+
+    // direct mode
+    app.post('/api/pixels/direct', ({ body: pixels }, res) => {
+        setup(pixels.length)
+        ledControl.emit('stop')
+        ledControl.emit('data', pixels)
         res.sendStatus(200)
     })
 

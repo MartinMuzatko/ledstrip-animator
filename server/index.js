@@ -5,8 +5,11 @@ const { eventloop, getPixelArray } = require('./ledloop')
 
 const ledControl = new EventEmitter()
 
-const setup = (amountPixels = 100, config = { invert: 1, frequency: 400000 }) => 
-    ws281x.init(amountPixels, config)
+
+const setup = (amountPixels = 100, config = { invert: 1, frequency: 400000 }) => {
+    ws281x.reset()
+    return ws281x.init(amountPixels, config)
+}
 
 web.init({ ledControl, ws281x, setup, port: process.env.PORT || 8090 })
 eventloop([], ledControl, 30)

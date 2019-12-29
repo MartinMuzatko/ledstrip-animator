@@ -5,9 +5,11 @@ const { eventloop, getPixelArray } = require('./ledloop')
 
 const ledControl = new EventEmitter()
 
+let ws281xActive = null
 
 const setup = (amountPixels = 100, config = { invert: 1, frequency: 400000 }) => {
-    ws281x.reset()
+    ws281xActive && ws281x.reset()
+    ws281xActive = true
     return ws281x.init(amountPixels, config)
 }
 

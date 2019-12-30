@@ -4,7 +4,7 @@ const { curry, map, fromPairs, min, max, pipe } = require('ramda')
 const getPixelArray = (pixels, rgborder = 'rgb') => {
     const order = rgborder.split('')
     const rgbByOrder = convertRgbToIntByOrder(order)
-    return new Uint32Array(pipe(map(colorbitRange), map(rgbByOrder))(pixels))
+    return new Uint32Array(pipe(map(map(colorbitRange)), map(rgbByOrder))(pixels))
 }
 
 const colorbitRange = pipe(max(0), min(255))
@@ -73,4 +73,5 @@ module.exports = {
     eventloop,
     rgb,
     tick,
+    colorbitRange,
 }
